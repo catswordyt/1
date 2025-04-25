@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Minecraft in Browser (CheerpJ + Natives)</title>
+  <style>
+    body, html { margin:0; padding:0; overflow:hidden; height:100%; }
+    #lwjgl { width:100%; height:100%; display:block; }
+  </style>
+</head>
+<body>
+  <!-- Canvas for LWJGL rendering -->
+  <canvas id="lwjgl"></canvas>
+
+  <!-- 1) CheerpJ loader -->
+  <script src="https://storage.googleapis.com/cheerpj/4.5/loader.js"></script>
+
+  <script>
+    window.addEventListener('load', async () => {
+      // 2) Initialize CheerpJ, telling it where cheerpj-natives live
+      await cheerpjInit({
+        wasmPath: 'https://storage.googleapis.com/cheerpj/4.5/cheerpj.wasm',
+        javaProperties: [
+          // Points at the folder where you host cheerpj-natives/natives
+          'java.library.path=/app/cheerpj-natives/natives'
+        ]
+      });
+
+      // 3) Create the display and hook it to our canvas
+      //    cheerpjCreateDisplay(width, height) sets up the GL context
+      const canvas = document.getElementById('lwjgl');
+      window.lwjglCanvasElement = canvas;
+      cheerpjCreateDisplay(canvas.width, canvas.height);
+
+      // 4) Grab the “latest” client JAR URL
+      const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(r=>r.json());
+      const latest = manifest.latest.release;
+      const info    = manifest.versions.find(v=>v.id===latest);
+      const versionJson = await fetch(info.url).then(r=>r.json());
+      const clientJar   = versionJson.downloads.client.url;
+
+      // 5) Run the official Minecraft client
+      cheerpjRun({
+        jar: clientJar,
+        mainClass: 'net.minecraft.client.Main',
+        args: [
+          '--gameDir','/usergame',
+          '--version',versionJson.id,
+          '--width', canvas.width,
+          '--height',canvas.height,
+          '--accessToken','00000000-0000-0000-0000-000000000000'
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
