@@ -1,17 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
   <title>Minecraft in Browser</title>
-  <style>
-    body, html { margin:0; padding:0; overflow:hidden; height:100%; }
-    #lwjgl { width:100%; height:100%; display:block; }
-  </style>
+  <style>body,html{margin:0;padding:0;overflow:hidden;height:100%}#lwjgl{width:100%;height:100%;display:block}</style>
 </head>
 <body>
   <canvas id="lwjgl"></canvas>
 
-  <!-- 1) JNI‐stub scripts (must come before CheerpJ loader) -->
+  <!-- 1) JNI stubs -->
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nCreateWindow.js"></script>
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nSetTitle.js"></script>
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nDestroyWindow.js"></script>
@@ -24,13 +21,7 @@
   <!-- 2) CheerpJ loader from CDN -->
   <script src="https://storage.googleapis.com/cheerpj/4.5/loader.js"></script>
 
-  <!-- 3) Your main launch logic -->
+  <!-- 3) Your launch logic -->
   <script src="main.js"></script>
-</body>
-</html>
-
-      });
-    });
-  </script>
 </body>
 </html>
