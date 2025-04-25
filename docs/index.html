@@ -36,18 +36,19 @@
         return;
       }
 
-      await cheerpjInit();  
+      await cheerpjInit();
       const canvas = document.getElementById('lwjgl');
       cheerpjCreateDisplay(canvas.width, canvas.height);
 
-      const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(r=>r.json());
+      const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json')
+                               .then(r=>r.json());
       const latestId = manifest.latest.release;
       const info     = manifest.versions.find(v=>v.id===latestId);
       const version  = await fetch(info.url).then(r=>r.json());
 
-      // This will fetch https://catswordyt.github.io/minecraft-client.jar
+      // ← relative path: no leading slash
       await cheerpjRunJar(
-        '/app/minecraft-client.jar',
+        'minecraft-client.jar',
         '--gameDir','/usergame',
         '--version', version.id,
         '--width',   canvas.width,
@@ -58,6 +59,7 @@
   </script>
 </body>
 </html>
+
 
       console.error('Startup error:', e);
     });
