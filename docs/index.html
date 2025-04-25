@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Minecraft in Browser</title>
+  <title>Minecraft 1.18.1 in Browser</title>
   <style>
     body, html { margin:0; padding:0; overflow:hidden; height:100%; }
     #lwjgl { width:100%; height:100%; display:block; }
@@ -28,41 +28,31 @@
     window.org_lwjgl_opengl_WindowsDisplay_nConfigureDisplay = () => 0;
   </script>
 
-  <!-- 3) Launch logic -->
+  <!-- 3) Launch 1.18.1.jar -->
   <script>
     (async function(){
       if (typeof cheerpjInit !== 'function') {
-        console.error('CheerpJ loader failed to define cheerpjInit().');
+        console.error('CheerpJ loader did not initialize.');
         return;
       }
 
+      // initialize the JVM
       await cheerpjInit();
+
+      // bind LWJGL to our canvas
       const canvas = document.getElementById('lwjgl');
       cheerpjCreateDisplay(canvas.width, canvas.height);
 
-      const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json')
-                               .then(r=>r.json());
-      const latestId = manifest.latest.release;
-      const info     = manifest.versions.find(v=>v.id===latestId);
-      const version  = await fetch(info.url).then(r=>r.json());
-
-      // ← relative path: no leading slash
+      // run the fixed 1.18.1 client jar (must be in docs/1.18.1.jar)
       await cheerpjRunJar(
-        'minecraft-client.jar',
+        '1.18.1.jar',
         '--gameDir','/usergame',
-        '--version', version.id,
+        '--version','1.18.1',
         '--width',   canvas.width,
         '--height',  canvas.height,
         '--accessToken','00000000-0000-0000-0000-000000000000'
       );
     })().catch(e => console.error('Startup error:', e));
-  </script>
-</body>
-</html>
-
-
-      console.error('Startup error:', e);
-    });
   </script>
 </body>
 </html>
