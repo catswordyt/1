@@ -11,61 +11,59 @@
 <body>
   <canvas id="lwjgl"></canvas>
 
-  <!-- 1) Inline all LWJGL JNI-stub definitions to avoid 404s -->
+  <!-- 1) Inline all LWJGL JNI stubs so there are no 404s -->
   <script>
-    // WindowsDisplay stubs
     window.org_lwjgl_opengl_WindowsDisplay_nCreateWindow      = (w,h) => 0;
-    window.org_lwjgl_opengl_WindowsDisplay_nSetTitle         = (ptr) => {};
+    window.org_lwjgl_opengl_WindowsDisplay_nSetTitle         = ptr => {};
     window.org_lwjgl_opengl_WindowsDisplay_nDestroyWindow    = () => {};
     window.org_lwjgl_opengl_WindowsDisplay_nIsCloseRequested = () => 0;
     window.org_lwjgl_opengl_WindowsDisplay_nPumpMessages     = () => {};
     window.org_lwjgl_opengl_WindowsDisplay_nMakeCurrent      = () => {};
     window.org_lwjgl_opengl_WindowsDisplay_nSwapBuffers      = () => {};
     window.org_lwjgl_opengl_WindowsDisplay_nConfigureDisplay = () => 0;
-    // (Add more stubs here if new ReferenceErrors appear)
+    // add more stubs here if new ReferenceErrors appear
   </script>
 
-  <!-- 2) CheerpJ loader from CDN -->
-  <script src="https://storage.googleapis.com/cheerpj/4.5/loader.js"></script>
+  <!-- 2) CheerpJ 4.0 loader from official CDN :contentReference[oaicite:0]{index=0} -->
+  <script src="https://cjrtnc.leaningtech.com/4.0/loader.js"></script>
 
-  <!-- 3) Launch logic in-line (no main.js) -->
+  <!-- 3) Launch logic -->
   <script>
-  (async function(){
-    const canvas = document.getElementById('lwjgl');
-
+  window.addEventListener('load', async () => {
+    // cheerpjInit is now defined by loader.js
     if (typeof cheerpjInit !== 'function') {
-      console.error('CheerpJ did not load — loader.js missing or blocked');
+      console.error('CheerpJ loader did not initialize.');
       return;
     }
 
-    // Initialize CheerpJ, point at CDN wasm
-    await cheerpjInit({
-      wasmPath: 'https://storage.googleapis.com/cheerpj/4.5/cheerpj.wasm',
-      javaProperties: ['java.library.path='] // no external natives folder needed
-    });
+    // initialize JVM (loader will fetch its own WASM)
+    await cheerpjInit();
 
-    // Create display on our canvas
+    // bind LWJGL to our canvas
+    const canvas = document.getElementById('lwjgl');
     cheerpjCreateDisplay(canvas.width, canvas.height);
 
-    // Fetch latest version manifest
-    const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(r=>r.json());
+    // fetch the “latest” release JAR URL
+    const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json')
+                             .then(r => r.json());
     const latestId = manifest.latest.release;
-    const info = manifest.versions.find(v=>v.id===latestId);
-    const versionInfo = await fetch(info.url).then(r=>r.json());
+    const info     = manifest.versions.find(v => v.id === latestId);
+    const version  = await fetch(info.url).then(r => r.json());
+    const client   = version.downloads.client.url;
 
-    // Launch official client
+    // run the official Minecraft client
     cheerpjRun({
-      jar: versionInfo.downloads.client.url,
+      jar: client,
       mainClass: 'net.minecraft.client.Main',
       args: [
         '--gameDir','/usergame',
-        '--version',versionInfo.id,
+        '--version',version.id,
         '--width', canvas.width,
         '--height',canvas.height,
         '--accessToken','00000000-0000-0000-0000-000000000000'
       ]
     });
-  })().catch(e=>{
+  }).catch(e => {
     console.error('Launch error:', e);
   });
   </script>
