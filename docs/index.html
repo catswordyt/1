@@ -11,7 +11,7 @@
 <body>
   <canvas id="lwjgl"></canvas>
 
-  <!-- 1) JNI‐stub scripts -->
+  <!-- 1) JNI‐stub scripts (must come before CheerpJ loader) -->
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nCreateWindow.js"></script>
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nSetTitle.js"></script>
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nDestroyWindow.js"></script>
@@ -21,8 +21,8 @@
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nSwapBuffers.js"></script>
   <script src="cheerpj-natives/natives/org_lwjgl_opengl_WindowsDisplay_nConfigureDisplay.js"></script>
 
-  <!-- 2) CheerpJ loader -->
-  <script src="cheerpj/4.5/loader.js"></script>
+  <!-- 2) CheerpJ loader from CDN -->
+  <script src="https://storage.googleapis.com/cheerpj/4.5/loader.js"></script>
 
   <!-- 3) Your main launch logic -->
   <script src="main.js"></script>
