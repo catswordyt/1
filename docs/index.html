@@ -7,16 +7,16 @@
     body, html { margin:0; padding:0; overflow:hidden; height:100%; }
     #lwjgl { width:100%; height:100%; display:block; }
   </style>
-  <!-- favicon link to suppress 404 (optional) -->
+  <!-- suppress favicon 404 -->
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 <body>
   <canvas id="lwjgl"></canvas>
 
-  <!-- 1) CheerpJ 4.0 loader from official CDN -->
+  <!-- 1) CheerpJ 4.0 loader -->
   <script src="https://cjrtnc.leaningtech.com/4.0/loader.js"></script>
 
-  <!-- 2) Inline LWJGL JNI stubs (so no external stub-.js files are needed) -->
+  <!-- 2) LWJGL JNI stubs -->
   <script>
     window.org_lwjgl_opengl_WindowsDisplay_nCreateWindow      = (w,h) => 0;
     window.org_lwjgl_opengl_WindowsDisplay_nSetTitle         = ptr => {};
@@ -28,40 +28,33 @@
     window.org_lwjgl_opengl_WindowsDisplay_nConfigureDisplay = () => 0;
   </script>
 
-  <!-- 3) Launch logic (inline; uses correct cheerpjRunJar API) -->
+  <!-- 3) Launch logic -->
   <script>
     (async function(){
       if (typeof cheerpjInit !== 'function') {
-        console.error('CheerpJ loader did not define cheerpjInit().');
+        console.error('CheerpJ loader failed to define cheerpjInit().');
         return;
       }
 
-      // a) Initialize the JVM (loader auto-loads its WASM)
-      await cheerpjInit();
-
-      // b) Bind LWJGL to our canvas
+      await cheerpjInit();  
       const canvas = document.getElementById('lwjgl');
       cheerpjCreateDisplay(canvas.width, canvas.height);
 
-      // c) Fetch “latest” Minecraft client version info
-      const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json')
-                               .then(r => r.json());
+      const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(r=>r.json());
       const latestId = manifest.latest.release;
-      const info     = manifest.versions.find(v => v.id === latestId);
-      const version  = await fetch(info.url).then(r => r.json());
+      const info     = manifest.versions.find(v=>v.id===latestId);
+      const version  = await fetch(info.url).then(r=>r.json());
 
-      // d) Run the client JAR from /app/minecraft-client.jar 
+      // This will fetch https://catswordyt.github.io/minecraft-client.jar
       await cheerpjRunJar(
-        '/app/minecraft-client.jar',               // virtual-FS path → docs/app/… on GitHub Pages
-        '--gameDir', '/usergame',
+        '/app/minecraft-client.jar',
+        '--gameDir','/usergame',
         '--version', version.id,
         '--width',   canvas.width,
         '--height',  canvas.height,
-        '--accessToken', '00000000-0000-0000-0000-000000000000'
+        '--accessToken','00000000-0000-0000-0000-000000000000'
       );
-    })().catch(e => {
-      console.error('Startup error:', e);
-    });
+    })().catch(e => console.error('Startup error:', e));
   </script>
 </body>
 </html>
