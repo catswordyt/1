@@ -1,25 +1,22 @@
 (async function(){
   const canvas = document.getElementById('lwjgl');
 
-  // 1) Initialize CheerpJ
+  // Initialize CheerpJ (hot-linking both JS loader and WASM)
   await cheerpjInit({
-    wasmPath: 'cheerpj/4.5/cheerpj.wasm',
-    javaProperties: [
-      // tell JVM where the native stubs live
-      'java.library.path=cheerpj-natives/natives'
-    ]
+    wasmPath: 'https://storage.googleapis.com/cheerpj/4.5/cheerpj.wasm',
+    javaProperties: ['java.library.path=cheerpj-natives/natives']
   });
 
-  // 2) Create an LWJGL display bound to our canvas
+  // Bind LWJGL to our canvas
   cheerpjCreateDisplay(canvas.width, canvas.height);
 
-  // 3) Fetch latest release metadata
+  // Fetch “latest” Minecraft client JAR URL
   const manifest = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(r=>r.json());
   const latestId = manifest.latest.release;
   const info = manifest.versions.find(v=>v.id===latestId);
   const versionInfo = await fetch(info.url).then(r=>r.json());
 
-  // 4) Launch official Minecraft client
+  // Launch Minecraft
   cheerpjRun({
     jar: versionInfo.downloads.client.url,
     mainClass: 'net.minecraft.client.Main',
